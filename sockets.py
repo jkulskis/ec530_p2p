@@ -1,0 +1,98 @@
+import socket
+from threading import Thread
+import time
+
+
+class Peer:
+    def __init__(self, ip: str, port: int, name: str) -> None:
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.r = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.r.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        self.ip = ip
+        self.port = port
+        self.name = name
+        self.is_active = True
+
+    def bind(self):
+        try:
+            self.r.bind((self.ip, self.port))
+        except Exception as e:
+            print("Error, could not bind socket to server " + self.ip + ":" + str(self.port))
+            print(e)
+
+    def connect(self, ip: str, port: int):
+        try:
+            self.s.connect((ip, port))
+        except Exception as e:
+            print("Error, could not establish connection with " + ip + ":" + str(port))
+            print(e)
+
+    def quit(self):
+        try:
+            print("--Disconnecting--")
+            self.s.close()
+            self.r.close()
+            print("--Disconnected--")
+        except:
+            print("--quit failed--")
+
+
+    def send(self, data: str):
+        try:
+            self.s.sendall(data.encode())
+        except:
+            print("Failed to send message")
+    def receive(self, max_buffer_size = 5120):
+        self.r.listen(1)
+        while self.is_active:
+            conn, addr = self.r.accept()
+            print("Connected with " + str(addr[0]) + ":" + str(addr[1]))
+            while self.is_active:
+                data = conn.recv(max_buffer_size)
+                if("--DISCONNECT--" in data.decode()):
+                    print("Peer is requesting to disconnect")
+                    print("Press any key to disconnect")
+                    self.is_active = False
+                else:
+                    print(data.decode())
+        conn.close()
+        print("Receiver deactivated")
+
+    def run_server(self, ip: str, port: int):
+        print("Starting server")
+        self.bind()
+        try:
+            Thread(target = self.receive).start()
+            print("Delaying 5 seconds")
+            time.sleep(5)
+            print("Delay done")
+        except Exception as e:
+            print("Could not start thread")
+            print(e)
+        self.connect(ip, port)
+        print("Type --DISCONNECT-- to quit the server")
+        message = input("Start your conversation:\n")
+        while (message != "--DISCONNECT--" and self.is_active != False):
+            self.send(self.name + " - " + message)
+            message = input(self.name + " - ")
+
+        if message == "--DISCONNECT--":
+            self.send(message)
+            self.is_active = False
+            print("Please wait for peer to disconnect")
+            time.sleep(5)
+            
+        self.quit()
+
+        return
+
+
+def main():
+    name = input("Enter your display name: ")
+    p = Peer('localhost', 50000, name)
+    p.run_server('localhost', 50001)
+
+if __name__ == "__main__":
+    main()
