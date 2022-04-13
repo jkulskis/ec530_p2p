@@ -14,6 +14,9 @@ class Peer:
         self.port = port
         self.name = name
         self.is_active = True
+        self.log_filename = f"{name}_{round(time.time())}.log"
+        with open(self.log_filename, "w") as f:
+            f.write(f"Started Socket at {time.strftime('%X %x %Z')} (EPOCH {round(time.time())})")
 
     def bind(self):
         try:
@@ -37,13 +40,20 @@ class Peer:
             print("--Disconnected--")
         except:
             print("--quit failed--")
-
+    
+    def log_msg(self, msg_data):
+        """Store messages between peers in db (TODO: Use actual DB, for now use log file)
+        """
+        with open(self.log_filename, "a") as f:
+            f.write(msg)
 
     def send(self, data: str):
         try:
+            self.log_msg(data)
             self.s.sendall(data.encode())
         except:
             print("Failed to send message")
+
     def receive(self, max_buffer_size = 5120):
         self.r.listen(1)
         while self.is_active:
@@ -56,6 +66,7 @@ class Peer:
                     print("Press any key to disconnect")
                     self.is_active = False
                 else:
+                    self.log_msg(data)
                     print(data.decode())
         conn.close()
         print("Receiver deactivated")
