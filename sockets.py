@@ -1,5 +1,6 @@
 import socket
 from threading import Thread
+import time
 
 
 class Peer:
@@ -14,6 +15,9 @@ class Peer:
         self.port = port
         self.name = name
         self.is_active = True
+        self.log_filename = f"{name}_{round(time.time())}.log"
+        with open(self.log_filename, "w") as f:
+            f.write(f"Started Socket at {time.strftime('%X %x %Z')} (EPOCH {round(time.time())})")
 
     def bind(self):
         try:
@@ -37,34 +41,40 @@ class Peer:
             print("--Disconnected--")
         except:
             print("--quit failed--")
-
+    
+    def log_msg(self, msg_data):
+        """Store messages between peers in db (TODO: Use actual DB, for now use log file)
+        """
+        with open(self.log_filename, "a") as f:
+            f.write(msg_data)
 
     def send(self, data: str):
         try:
+            self.log_msg(data)
             self.s.sendall(data.encode())
         except:
             print("Failed to send message")
 
     def receive(self, max_buffer_size = 5120):
         self.r.listen(1)
+        self.is_active = True
+        self.conn, addr = self.r.accept()
+        print("Connected with " + str(addr[0]) + ":" + str(addr[1]))
         while self.is_active:
-            self.conn, addr = self.r.accept()
-            print("Connected with " + str(addr[0]) + ":" + str(addr[1]))
-            while self.is_active:
-                try:
-                    data = self.conn.recv(max_buffer_size)  
-                    if("--DISCONNECT--" in data.decode()):
-                        print("Peer is requesting to disconnect")
-                        print("Press any key to disconnect")
-                        self.is_active = False
-                    else:
-                        print("\n" + data.decode())
-                except ConnectionAbortedError:
-                    print("Peer has disconnected")
-                    self.is_active = False 
-                except Exception as e:
-                    print("Error, could not receive message")
-                    raise(e)
+            try:
+                data = self.conn.recv(max_buffer_size)  
+                if("--DISCONNECT--" in data.decode()):
+                    print("Peer is requesting to disconnect")
+                    print("Press any key to disconnect")
+                    self.is_active = False
+                else:
+                    print("\n" + data.decode())
+            except ConnectionAbortedError:
+                print("Peer has disconnected")
+                self.is_active = False 
+            except Exception as e:
+                print("Error, could not receive message")
+                raise(e)
         print("Receiver deactivated")
 
     def run_server(self, ip: str, port: int):
