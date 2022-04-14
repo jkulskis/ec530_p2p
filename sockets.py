@@ -68,7 +68,7 @@ class Peer:
                     print("Press any key to disconnect")
                     self.is_active = False
                 else:
-                    print("\n" + data.decode())
+                    print(data.decode())
             except ConnectionAbortedError:
                 print("Peer has disconnected")
                 self.is_active = False 
