@@ -85,20 +85,21 @@ class Peer:
         except Exception as e:
             print("Could not start thread")
             print(e)
+        time.sleep(5)
         self.connect(ip, port)
-        print("Type --DISCONNECT-- to quit the server")
-        message = input("Start your conversation:\n")
-        while (message != "--DISCONNECT--" and self.is_active):
-            self.send(self.name + " - " + message)
-            message = input()
+        # print("Type --DISCONNECT-- to quit the server")
+        # message = input("Start your conversation:\n")
+        # while (message != "--DISCONNECT--" and self.is_active):
+        #     self.send(self.name + " - " + message)
+        #     message = input()
 
-        if message == "--DISCONNECT--":
-            self.send(message)
-            self.is_active = False
-            self.conn.close()
-            print("Please wait for peer to disconnect")
+        # if message == "--DISCONNECT--":
+        #     self.send(message)
+        #     self.is_active = False
+        #     self.conn.close()
+        #     print("Please wait for peer to disconnect")
             
-        self.quit()
+        # self.quit()
 
         return
 

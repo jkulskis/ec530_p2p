@@ -22,6 +22,24 @@ print('delete Daniel')
 response = requests.delete(BASE + 'peers/Daniel', json = data)
 print(handle_request(response))
 
+jmdata = {
+    'IP': '10.0.0.94', 
+    'port': 50000,
+    'password': 'hello'
+}
+print('delete jm')
+response = requests.delete(BASE + 'peers/jm', json = jmdata)
+print(handle_request(response))
+
+tiffadata = {
+    'IP': '10.0.0.94', 
+    'port': 50001,
+    'password': 'hello'
+}
+print('delete tiffany')
+response = requests.delete(BASE + 'peers/tiffa', json = jmdata)
+print(handle_request(response))
+
 print('get Daniel')
 response = requests.get(BASE + 'peers/Daniel')
 print(handle_request(response))

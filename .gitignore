@@ -1,6 +1,6 @@
 # manual entries
 *.db
-
+unsent.txt
 
 # everything below came from sample .gitignore...
 
