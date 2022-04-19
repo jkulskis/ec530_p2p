@@ -87,27 +87,5 @@ class Peer:
             print(e)
         time.sleep(5)
         self.connect(ip, port)
-        # print("Type --DISCONNECT-- to quit the server")
-        # message = input("Start your conversation:\n")
-        # while (message != "--DISCONNECT--" and self.is_active):
-        #     self.send(self.name + " - " + message)
-        #     message = input()
-
-        # if message == "--DISCONNECT--":
-        #     self.send(message)
-        #     self.is_active = False
-        #     self.conn.close()
-        #     print("Please wait for peer to disconnect")
-            
-        # self.quit()
 
         return
-
-
-def main():
-    name = input("Enter your display name: ")
-    p = Peer('localhost', 50000, name)
-    p.run_server('localhost', 50001)
-
-if __name__ == "__main__":
-    main()
