@@ -63,4 +63,37 @@ In addition, it creates your client and server sockets for sending and receiving
 
 ## Phonebook Server
 
-### `PeerResource` Class
+### Endpoints:
+
+- `/peers/<string:username>`\
+Create, delete (your own), and read users from the phonebook using their username.
+
+    - POST user example:
+    ```python
+    data = { 
+        'IP': '127.0.0.1:5000', 
+        'port': 80,
+        'password': 'password'
+    }
+    response = requests.post(BASE + 'peers/*username*', json = data)
+    ``` 
+
+    - GET user example:
+    ```python
+    response = requests.get(BASE + 'peers/*username*')
+    ```
+
+    - DELETE (your own) user example:
+    ```python
+    data = { 
+        'password': 'password'
+    }
+    response = requests.delete(BASE + 'peers/*username*', json = data)
+    ```
+
+- `/peers/`
+    - GET (all) users example:
+    ``` python
+    response = requests.get(BASE + 'peers/')
+    ```
+
